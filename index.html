@@ -128,6 +128,13 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--blue)}
       <input type="text" id="login-nome" placeholder="Ex: Ana Silva" autocomplete="name">
     </div>
     <div class="field">
+      <label>Perfil</label>
+      <select id="login-perfil">
+        <option value="promotora">Promotora</option>
+        <option value="gestor">Gestor</option>
+      </select>
+    </div>
+    <div class="field">
       <label>Senha</label>
       <input type="password" id="login-senha" placeholder="Senha da equipe" autocomplete="current-password">
     </div>
@@ -136,7 +143,7 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--blue)}
       <i class="ti ti-login"></i> Entrar
     </button>
   </div>
-  <p style="margin-top:16px;font-size:12px;color:var(--text3)">Senha padrão: <strong>promo2024</strong></p>
+  <p style="margin-top:16px;font-size:12px;color:var(--text3)">Promotora: <strong>promo2024</strong> · Gestor: <strong>gestor2024</strong></p>
 </div>
 
 <div id="app">
@@ -205,6 +212,20 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--blue)}
           <div class="sbox" id="box-m"><div class="sbox-lbl"><i class="ti ti-shopping-cart"></i> Mercearia</div><input type="number" id="s-m" value="0" min="0" inputmode="numeric" oninput="updStock()"><div class="sbox-st" id="st-m"></div></div>
           <div class="sbox" id="box-r"><div class="sbox-lbl"><i class="ti ti-snowflake"></i> Refrigerado</div><input type="number" id="s-r" value="0" min="0" inputmode="numeric" oninput="updStock()"><div class="sbox-st" id="st-r"></div></div>
           <div class="sbox" id="box-d"><div class="sbox-lbl"><i class="ti ti-building-warehouse"></i> Depósito</div><input type="number" id="s-d" value="0" min="0" inputmode="numeric" oninput="updStock()"><div class="sbox-st" id="st-d"></div></div>
+        </div>
+        <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:5px"><i class="ti ti-droplet"></i> Estoque por sabor</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block">Manga e Cassis</label>
+              <input type="number" id="s-mc" value="0" min="0" inputmode="numeric" oninput="updStock()" style="font-size:15px;padding:8px 10px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--text2);margin-bottom:4px;display:block">Framboesa e Maracujá</label>
+              <input type="number" id="s-fm" value="0" min="0" inputmode="numeric" oninput="updStock()" style="font-size:15px;padding:8px 10px">
+            </div>
+          </div>
+          <div id="sabores-alerta" style="display:none;margin-top:8px;font-size:11px;color:var(--warn-text);font-weight:600"></div>
         </div>
         <div class="field-row">
           <div><label>Ruptura de gôndola</label><select id="v-rupt"><option value="nao">Não</option><option value="sim">Sim</option><option value="parcial">Parcial</option></select></div>
@@ -316,53 +337,68 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const SENHA = 'promo2024';
-let usuario = '';
-let visitas = [];
-let agenda = [];
-try { agenda = JSON.parse(localStorage.getItem('pf_ag') || '[]'); } catch(e) {}
+const SENHA_PROMOTORA = 'promo2024';
+const SENHA_GESTOR = 'gestor2024';
+let perfil = 'promotora';
 
-// STATUS ONLINE
-window.addEventListener('online', () => updSyncStatus(true));
-window.addEventListener('offline', () => updSyncStatus(false));
-function updSyncStatus(online) {
-  const el = document.getElementById('sync-status');
-  el.innerHTML = online
-    ? '<span class="online-dot"></span>'
-    : '<span class="offline-dot" title="Sem conexão"></span>';
-}
-updSyncStatus(navigator.onLine);
-
-// LOGIN
 window.fazerLogin = function() {
   const nome = document.getElementById('login-nome').value.trim();
   const senha = document.getElementById('login-senha').value;
+  const p = document.getElementById('login-perfil').value;
   if (!nome) { alert('Digite seu nome.'); return; }
-  if (senha !== SENHA) { document.getElementById('login-err').style.display = 'block'; return; }
+  const senhaCorreta = p === 'gestor' ? SENHA_GESTOR : SENHA_PROMOTORA;
+  if (senha !== senhaCorreta) { document.getElementById('login-err').style.display = 'block'; return; }
   usuario = nome;
+  perfil = p;
   localStorage.setItem('pf_usuario', nome);
+  localStorage.setItem('pf_perfil', p);
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  document.getElementById('topbar-user').textContent = usuario;
+  document.getElementById('topbar-user').textContent = usuario + (perfil==='gestor' ? ' · Gestor' : '');
   document.getElementById('v-prom').value = usuario;
+  aplicarPerfil();
   initApp();
 };
 
 window.fazerLogout = function() {
   if (!confirm('Sair?')) return;
   localStorage.removeItem('pf_usuario');
+  localStorage.removeItem('pf_perfil');
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('login-senha').value = '';
 };
 
+let usuario = '';
+let visitas = [];
+let agenda = [];
+try { agenda = JSON.parse(localStorage.getItem('pf_ag') || '[]'); } catch(e) {}
+
+window.addEventListener('online', () => updSyncStatus(true));
+window.addEventListener('offline', () => updSyncStatus(false));
+function updSyncStatus(online) {
+  const el = document.getElementById('sync-status');
+  el.innerHTML = online ? '<span class="online-dot"></span>' : '<span class="offline-dot" title="Sem conexão"></span>';
+}
+updSyncStatus(navigator.onLine);
+
+function aplicarPerfil() {
+  const isGestor = perfil === 'gestor';
+  document.getElementById('bn-deg').style.display = isGestor ? 'flex' : 'none';
+  document.getElementById('bn-gestor').style.display = isGestor ? 'flex' : 'none';
+  document.getElementById('tab-deg').style.display = isGestor ? '' : 'none';
+  document.getElementById('tab-gestor').style.display = isGestor ? '' : 'none';
+}
+
 const savedUser = localStorage.getItem('pf_usuario');
 if (savedUser) {
   usuario = savedUser;
+  perfil = localStorage.getItem('pf_perfil') || 'promotora';
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  document.getElementById('topbar-user').textContent = usuario;
+  document.getElementById('topbar-user').textContent = usuario + (perfil==='gestor' ? ' · Gestor' : '');
   document.getElementById('v-prom').value = usuario;
+  aplicarPerfil();
   initApp();
 }
 
@@ -403,6 +439,14 @@ window.updStock = function() {
     document.getElementById(b).className = 'sbox ' + sClass(v);
     document.getElementById(s).textContent = sLabel(v);
   });
+  const mc = parseInt(document.getElementById('s-mc').value)||0;
+  const fm = parseInt(document.getElementById('s-fm').value)||0;
+  const alerts = [];
+  if (mc===0) alerts.push('Manga e Cassis zerado');
+  if (fm===0) alerts.push('Framboesa e Maracujá zerado');
+  const sa = document.getElementById('sabores-alerta');
+  if (alerts.length) { sa.textContent = '⚠️ ' + alerts.join(' · '); sa.style.display='block'; }
+  else { sa.style.display='none'; }
   checkCritBanner();
 };
 window.checkBloq = function() {
@@ -437,6 +481,8 @@ window.salvarVisita = async function() {
     mercearia: parseInt(document.getElementById('s-m').value)||0,
     refrigerado: parseInt(document.getElementById('s-r').value)||0,
     deposito: parseInt(document.getElementById('s-d').value)||0,
+    mangaCassis: parseInt(document.getElementById('s-mc').value)||0,
+    framboesaMaracuja: parseInt(document.getElementById('s-fm').value)||0,
     ruptura: document.getElementById('v-rupt').value,
     validade: document.getElementById('v-val').value,
     preco: document.getElementById('v-prec').value,
@@ -453,7 +499,7 @@ window.salvarVisita = async function() {
     document.getElementById('v-obs').value = '';
     document.getElementById('v-bloq').checked = false;
     document.getElementById('bloq-alert').style.display = 'none';
-    ['s-m','s-r','s-d'].forEach(id => document.getElementById(id).value = 0);
+    ['s-m','s-r','s-d','s-mc','s-fm'].forEach(id => document.getElementById(id).value = 0);
     updStock();
   } catch(e) {
     toast('Erro ao salvar. Verifique conexão.', '#E24B4A');
