@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Promotoria Field</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{--bg:#fff;--bg2:#f5f5f5;--bg3:#efefef;--text:#111;--text2:#555;--text3:#999;--border:#e0e0e0;--border2:#ccc;--blue:#185FA5;--blue-bg:#E6F1FB;--blue-text:#0C447C;--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#085041;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#791F1F;--warn:#BA7517;--warn-bg:#FAEEDA;--warn-text:#633806;--radius:10px;--radius-sm:7px}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;--text:#f0f0f0;--text2:#aaa;--text3:#666;--border:#333;--border2:#444;--blue:#378ADD;--blue-bg:#0c2a44;--blue-text:#85B7EB;--green:#1D9E75;--green-bg:#04342C;--green-text:#9FE1CB;--red:#E24B4A;--red-bg:#3a1010;--red-text:#F09595;--warn:#EF9F27;--warn-bg:#3a2a05;--warn-text:#FAC775}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:var(--bg)}
+.login-logo{width:64px;height:64px;background:var(--blue-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.login-logo i{font-size:32px;color:var(--blue)}
+.login-title{font-size:22px;font-weight:600;color:var(--text);margin-bottom:6px;text-align:center}
+.login-sub{font-size:14px;color:var(--text2);margin-bottom:32px;text-align:center}
+.login-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:360px}
+.login-card label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.login-card input{width:100%;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;font-size:16px;color:var(--text);margin-bottom:12px}
+.login-err{font-size:13px;color:var(--red);margin-bottom:10px;display:none}
+.sync-bar{background:var(--green-bg);border:0.5px solid var(--green);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--green-text);margin-bottom:10px;display:none;align-items:center;gap:6px}
+.sync-bar.show{display:flex}
+#app{display:none;max-width:480px;margin:0 auto;padding-bottom:80px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;position:sticky;top:0;background:var(--bg);border-bottom:0.5px solid var(--border);z-index:10}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text)}
+.topbar-user{font-size:11px;color:var(--text3)}
+.bell-wrap{position:relative;cursor:pointer;padding:4px}
+.bell-wrap i{font-size:24px;color:var(--text2)}
+.bell-badge{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 3px}
+.tab{display:none}.tab.active{display:block}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg);border-top:0.5px solid var(--border);display:flex;z-index:20}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 12px;font-size:10px;color:var(--text3);cursor:pointer;background:none;border:none;gap:3px}
+.bnav-btn i{font-size:24px}
+.bnav-btn.active{color:var(--blue)}
+.section{padding:14px 16px}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+input[type=text],input[type=time],input[type=date],input[type=number],input[type=password],select,textarea{width:100%;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:11px 13px;font-size:16px;color:var(--text);-webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+textarea{resize:vertical;min-height:80px;font-size:14px}
+.field{margin-bottom:12px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stock-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sbox{border-radius:var(--radius-sm);padding:10px 6px;text-align:center;border:1px solid var(--border);background:var(--bg3);transition:all .2s}
+.sbox.ok{border-color:var(--green);background:var(--green-bg)}
+.sbox.warn{border-color:var(--warn);background:var(--warn-bg)}
+.sbox.crit{border-color:var(--red);background:var(--red-bg)}
+.sbox-lbl{font-size:10px;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:3px}
+.sbox input{font-size:22px;font-weight:700;text-align:center;background:transparent;border:none;border-bottom:1px solid var(--border2);border-radius:0;padding:2px 0;width:68px;color:var(--text)}
+.sbox-st{font-size:10px;margin-top:5px;font-weight:600}
+.sbox.ok .sbox-st{color:var(--green-text)}
+.sbox.warn .sbox-st{color:var(--warn-text)}
+.sbox.crit .sbox-st{color:var(--red-text)}
+.btn-primary{width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:active{opacity:.85}
+.btn-ai{width:100%;background:var(--warn-bg);color:var(--warn-text);border:1px solid var(--warn);border-radius:var(--radius-sm);padding:13px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-sec{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:11px 16px;font-size:14px;cursor:pointer;color:var(--text2)}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:var(--radius-sm);font-weight:600;white-space:nowrap}
+.b-ok{background:var(--green-bg);color:var(--green-text)}
+.b-warn{background:var(--warn-bg);color:var(--warn-text)}
+.b-danger{background:var(--red-bg);color:var(--red-text)}
+.b-info{background:var(--blue-bg);color:var(--blue-text)}
+.dec-box{border-radius:var(--radius);padding:14px;margin-top:10px;border:1px solid var(--border)}
+.dec-box.go{background:var(--green-bg);border-color:var(--green)}
+.dec-box.nogo{background:var(--red-bg);border-color:var(--red)}
+.dec-box.cond{background:var(--warn-bg);border-color:var(--warn)}
+.dec-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.dec-body{font-size:13px;color:var(--text2);line-height:1.5}
+.alert-panel{display:none;position:fixed;inset:0;background:var(--bg);z-index:40;overflow-y:auto;padding-bottom:80px}
+.alert-panel.open{display:block}
+.alert-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg)}
+.alert-item{padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;gap:12px;align-items:flex-start}
+.alert-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.alert-ico.danger{background:var(--red-bg);color:var(--red)}
+.alert-ico.warn{background:var(--warn-bg);color:var(--warn)}
+.gestor-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.metric-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.metric-num{font-size:28px;font-weight:700;color:var(--text)}
+.metric-lbl{font-size:11px;color:var(--text3);margin-top:3px}
+.metric-card.danger .metric-num{color:var(--red)}
+.metric-card.ok .metric-num{color:var(--green)}
+.hist-item{padding:13px 16px;border-bottom:0.5px solid var(--border);cursor:pointer}
+.hist-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.hist-loja{font-size:15px;font-weight:600;color:var(--text)}
+.hist-meta{font-size:11px;color:var(--text3);text-align:right;line-height:1.4}
+.hist-badges{display:flex;gap:5px;flex-wrap:wrap}
+.ag-item{padding:13px 16px;border-bottom:0.5px solid var(--border);display:flex;gap:10px;align-items:center}
+.ai-box{background:var(--bg3);border-radius:var(--radius);padding:14px;font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;margin-top:10px}
+.loading{display:none;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--text3);padding:14px 0}
+.loading.on{display:flex}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .9s linear infinite;display:inline-block}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--text3);font-size:14px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50}
+.modal-overlay.open{display:flex;align-items:flex-end}
+.modal{background:var(--bg);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:20px 16px 40px}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:14px}
+.modal-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:14px}
+.modal-key{color:var(--text2)}
+.modal-val{font-weight:500;color:var(--text);text-align:right;max-width:55%}
+.btn-close-modal{width:100%;margin-top:16px;padding:13px;border-radius:var(--radius-sm);background:var(--bg3);border:0.5px solid var(--border2);font-size:15px;font-weight:600;cursor:pointer;color:var(--text)}
+.switch-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+.switch-row label{margin:0;font-size:14px;color:var(--text);font-weight:400}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--blue)}
+.crit-banner{background:var(--red-bg);border:1px solid var(--red);border-radius:var(--radius-sm);padding:11px 14px;display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer}
+.crit-banner-txt{flex:1;font-size:13px;color:var(--red-text);font-weight:600}
+.toast{display:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);border-radius:var(--radius);padding:11px 22px;font-size:14px;font-weight:600;z-index:60;white-space:nowrap;color:#fff}
+.toast.show{display:block}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px}
+.offline-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;margin-right:4px}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-logo"><i class="ti ti-clipboard-check"></i></div>
+  <div class="login-title">Promotoria Field</div>
+  <div class="login-sub">Magic Biotech Foods</div>
+  <div class="login-card">
+    <div class="sync-bar" id="sync-bar"><i class="ti ti-cloud-check"></i> Dados sincronizados em tempo real</div>
+    <div class="field">
+      <label>Seu nome</label>
+      <input type="text" id="login-nome" placeholder="Ex: Ana Silva" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="login-senha" placeholder="Senha da equipe" autocomplete="current-password">
+    </div>
+    <div class="login-err" id="login-err">Senha incorreta. Verifique com seu supervisor.</div>
+    <button class="btn-full" onclick="fazerLogin()" style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      <i class="ti ti-login"></i> Entrar
+    </button>
+  </div>
+  <p style="margin-top:16px;font-size:12px;color:var(--text3)">Senha padrão: <strong>promo2024</strong></p>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="topbar-title">Registrar visita</div>
+      <div class="topbar-user" id="topbar-user"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="sync-status" title="Status da conexão"></span>
+      <div class="bell-wrap" onclick="toggleAlerts()">
+        <i class="ti ti-bell"></i>
+        <div class="bell-badge" id="bell-badge">0</div>
+      </div>
+      <button onclick="fazerLogout()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px"><i class="ti ti-logout"></i></button>
+    </div>
+  </div>
+
+  <div class="alert-panel" id="alert-panel">
+    <div class="alert-hdr">
+      <span style="font-size:16px;font-weight:600"><i class="ti ti-bell-ringing"></i> Alertas críticos</span>
+      <button class="btn-sec" onclick="toggleAlerts()" style="padding:7px 14px">Fechar</button>
+    </div>
+    <div id="alert-lista"><div class="empty">Sem alertas.</div></div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay" onclick="fecharModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div id="modal-body"></div>
+      <button class="btn-close-modal" onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+
+  <!-- TAB VISITA -->
+  <div id="tab-visita" class="tab active">
+    <div class="section">
+      <div id="crit-banner"></div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-user"></i> Dados da visita</div>
+        <div class="field-row">
+          <div><label>Promotora</label><input type="text" id="v-prom" readonly></div>
+          <div><label>Chegada</label><input type="time" id="v-hora"></div>
+        </div>
+        <div class="field-row">
+          <div><label>Loja</label><input type="text" id="v-loja" placeholder="Nome da loja"></div>
+          <div><label>Rede / Bandeira</label><input type="text" id="v-rede" placeholder="Ex: Carrefour"></div>
+        </div>
+        <div class="field-row">
+          <div><label>Data</label><input type="date" id="v-data"></div>
+          <div><label>Código da loja</label><input type="text" id="v-cod" placeholder="Ex: 0042" inputmode="numeric"></div>
+        </div>
+        <div class="switch-row">
+          <input type="checkbox" id="v-bloq" onchange="checkBloq()">
+          <label for="v-bloq">Loja bloqueada no sistema</label>
+        </div>
+        <div id="bloq-alert" style="display:none" class="dec-box nogo">
+          <div class="dec-title"><i class="ti ti-lock"></i> Loja bloqueada</div>
+          <div class="dec-body">Não é possível inserir pedidos. Comunique o supervisor.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-package"></i> Estoque</div>
+        <div class="stock-row">
+          <div class="sbox" id="box-m"><div class="sbox-lbl"><i class="ti ti-shopping-cart"></i> Mercearia</div><input type="number" id="s-m" value="0" min="0" inputmode="numeric" oninput="updStock()"><div class="sbox-st" id="st-m"></div></div>
+          <div class="sbox" id="box-r"><div class="sbox-lbl"><i class="ti ti-snowflake"></i> Refrigerado</div><input type="number" id="s-r" value="0" min="0" inputmode="numeric" oninput="updStock()"><div class="sbox-st" id="st-r"></div></div>
+          <div class="sbox" id="box-d"><div class="sbox-lbl"><i class="ti ti-building-warehouse"></i> Depósito</div><input type="number" id="s-d" value="0" min="0" inputmode="numeric" oninput="updStock()"><div class="sbox-st" id="st-d"></div></div>
+        </div>
+        <div class="field-row">
+          <div><label>Ruptura de gôndola</label><select id="v-rupt"><option value="nao">Não</option><option value="sim">Sim</option><option value="parcial">Parcial</option></select></div>
+          <div><label>Validade</label><select id="v-val"><option value="ok">Ok</option><option value="alerta">Próxima ao venc.</option><option value="vencido">Vencidos</option></select></div>
+        </div>
+        <div class="field-row">
+          <div><label>Precificação</label><select id="v-prec"><option value="ok">Correta</option><option value="nao">Incorreta</option><option value="ausente">Etiqueta ausente</option></select></div>
+          <div><label>Planograma</label><select id="v-plan"><option value="ok">Correto</option><option value="deslocado">Deslocado</option><option value="nao_enc">Não encontrado</option></select></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-notes"></i> Observações</div>
+        <div class="field"><textarea id="v-obs" placeholder="Condição da loja, concorrência, ações realizadas..."></textarea></div>
+        <button class="btn-primary" onclick="salvarVisita()"><i class="ti ti-device-floppy"></i> Salvar visita</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB DEGUSTAÇÃO -->
+  <div id="tab-deg" class="tab">
+    <div class="section">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-sparkles"></i> Análise de degustação</div>
+        <div class="field-row">
+          <div><label>Loja</label><input type="text" id="d-loja" placeholder="Nome"></div>
+          <div><label>Rede</label><input type="text" id="d-rede" placeholder="Bandeira"></div>
+        </div>
+        <div class="stock-row">
+          <div><label style="text-align:center;display:block;font-size:11px">Mercearia</label><input type="number" id="d-m" value="0" min="0" inputmode="numeric"></div>
+          <div><label style="text-align:center;display:block;font-size:11px">Refrigerado</label><input type="number" id="d-r" value="0" min="0" inputmode="numeric"></div>
+          <div><label style="text-align:center;display:block;font-size:11px">Depósito</label><input type="number" id="d-d" value="0" min="0" inputmode="numeric"></div>
+        </div>
+        <div class="field-row">
+          <div><label>Bloqueada?</label><select id="d-bloq"><option value="nao">Não</option><option value="sim">Sim</option><option value="parcial">Parcial</option></select></div>
+          <div><label>Ruptura?</label><select id="d-rupt"><option value="nao">Não</option><option value="sim">Sim</option><option value="parcial">Parcial</option></select></div>
+        </div>
+        <div class="field-row">
+          <div><label>Fluxo de clientes</label><select id="d-fluxo"><option value="alto">Alto</option><option value="medio">Médio</option><option value="baixo">Baixo</option></select></div>
+          <div><label>Promotora disponível?</label><select id="d-disp"><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+        </div>
+        <div class="field"><label>Observação da promotora</label><textarea id="d-obs" placeholder="O que você observou na loja?"></textarea></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn-sec" style="flex:1" onclick="decidirRapido()"><i class="ti ti-bolt"></i> Decisão rápida</button></div>
+        <button class="btn-ai" onclick="analisarDeg()"><i class="ti ti-sparkles"></i> Analisar com IA</button>
+      </div>
+      <div class="loading" id="load-deg"><i class="ti ti-loader spin"></i> Analisando...</div>
+      <div id="dec-local" style="display:none" class="dec-box"></div>
+      <div id="ai-deg-card" style="display:none" class="card">
+        <div class="card-title"><i class="ti ti-robot"></i> Recomendação da IA</div>
+        <div class="ai-box" id="ai-deg-txt"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB GESTOR -->
+  <div id="tab-gestor" class="tab">
+    <div class="section">
+      <div id="gestor-metrics"></div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-calendar-plus"></i> Agendar visita</div>
+        <div class="field-row">
+          <div><label>Loja</label><input type="text" id="ag-loja" placeholder="Nome"></div>
+          <div><label>Promotora</label><input type="text" id="ag-prom" placeholder="Nome"></div>
+        </div>
+        <div class="field-row">
+          <div><label>Data</label><input type="date" id="ag-data"></div>
+          <div><label>Tipo</label><select id="ag-tipo"><option value="rotina">Rotina</option><option value="degustacao">Degustação</option><option value="reposicao">Reposição urgente</option><option value="auditoria">Auditoria</option></select></div>
+        </div>
+        <button class="btn-primary" onclick="agendarVisita()"><i class="ti ti-plus"></i> Agendar</button>
+      </div>
+      <div id="lista-agenda"><div class="empty">Nenhuma visita agendada.</div></div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn-primary" onclick="exportCSV()" style="flex:1"><i class="ti ti-download"></i> Exportar CSV</button>
+        <button class="btn-ai" onclick="resumoDia()" style="flex:1"><i class="ti ti-file-text"></i> Resumo do dia</button>
+      </div>
+      <div class="loading" id="load-res"><i class="ti ti-loader spin"></i> Gerando resumo...</div>
+      <div id="resumo-txt" style="display:none" class="ai-box"></div>
+    </div>
+  </div>
+
+  <!-- TAB HISTÓRICO -->
+  <div id="tab-hist" class="tab">
+    <div id="lista-hist"><div class="empty" style="padding-top:2rem"><i class="ti ti-loader spin" style="font-size:24px"></i><br>Carregando...</div></div>
+  </div>
+
+  <div class="bnav">
+    <button class="bnav-btn active" id="bn-visita" onclick="navTo('visita','Registrar visita')"><i class="ti ti-clipboard-check"></i><span>Visita</span></button>
+    <button class="bnav-btn" id="bn-deg" onclick="navTo('deg','Degustação IA')"><i class="ti ti-sparkles"></i><span>Degust.</span></button>
+    <button class="bnav-btn" id="bn-gestor" onclick="navTo('gestor','Painel gestor')"><i class="ti ti-layout-dashboard"></i><span>Gestor</span></button>
+    <button class="bnav-btn" id="bn-hist" onclick="navTo('hist','Histórico')"><i class="ti ti-history"></i><span>Histórico</span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAYXm_MZTqqEqKnt47ka9gUdy4ex_ybTjw",
+  authDomain: "promotoria-field.firebaseapp.com",
+  projectId: "promotoria-field",
+  storageBucket: "promotoria-field.firebasestorage.app",
+  messagingSenderId: "646335499477",
+  appId: "1:646335499477:web:d8faaae3471d018c32a65c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const SENHA = 'promo2024';
+let usuario = '';
+let visitas = [];
+let agenda = [];
+try { agenda = JSON.parse(localStorage.getItem('pf_ag') || '[]'); } catch(e) {}
+
+// STATUS ONLINE
+window.addEventListener('online', () => updSyncStatus(true));
+window.addEventListener('offline', () => updSyncStatus(false));
+function updSyncStatus(online) {
+  const el = document.getElementById('sync-status');
+  el.innerHTML = online
+    ? '<span class="online-dot"></span>'
+    : '<span class="offline-dot" title="Sem conexão"></span>';
+}
+updSyncStatus(navigator.onLine);
+
+// LOGIN
+window.fazerLogin = function() {
+  const nome = document.getElementById('login-nome').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  if (!nome) { alert('Digite seu nome.'); return; }
+  if (senha !== SENHA) { document.getElementById('login-err').style.display = 'block'; return; }
+  usuario = nome;
+  localStorage.setItem('pf_usuario', nome);
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('topbar-user').textContent = usuario;
+  document.getElementById('v-prom').value = usuario;
+  initApp();
+};
+
+window.fazerLogout = function() {
+  if (!confirm('Sair?')) return;
+  localStorage.removeItem('pf_usuario');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-senha').value = '';
+};
+
+const savedUser = localStorage.getItem('pf_usuario');
+if (savedUser) {
+  usuario = savedUser;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('topbar-user').textContent = usuario;
+  document.getElementById('v-prom').value = usuario;
+  initApp();
+}
+
+function initApp() {
+  const now = new Date();
+  document.getElementById('v-data').value = now.toISOString().slice(0,10);
+  document.getElementById('ag-data').value = now.toISOString().slice(0,10);
+  document.getElementById('v-hora').value = now.toTimeString().slice(0,5);
+  updStock();
+  renderAgenda();
+  // ESCUTA FIREBASE EM TEMPO REAL
+  const q = query(collection(db, 'visitas'), orderBy('criadoEm', 'desc'));
+  onSnapshot(q, (snapshot) => {
+    visitas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderHist();
+    renderAlertas();
+    renderMetrics();
+    document.getElementById('sync-bar').classList.add('show');
+    setTimeout(() => document.getElementById('sync-bar').classList.remove('show'), 2000);
+  });
+}
+
+// NAV
+window.navTo = function(name, title) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('bn-' + name).classList.add('active');
+  document.getElementById('topbar-title').textContent = title;
+};
+
+// STOCK
+function sClass(v) { return v === 0 ? 'crit' : v <= 5 ? 'warn' : 'ok'; }
+function sLabel(v) { return v === 0 ? 'Sem estoque' : v <= 5 ? 'Baixo' : 'Ok'; }
+window.updStock = function() {
+  [['m','box-m','st-m'],['r','box-r','st-r'],['d','box-d','st-d']].forEach(([k,b,s]) => {
+    const v = parseInt(document.getElementById('s-'+k).value) || 0;
+    document.getElementById(b).className = 'sbox ' + sClass(v);
+    document.getElementById(s).textContent = sLabel(v);
+  });
+  checkCritBanner();
+};
+window.checkBloq = function() {
+  const bl = document.getElementById('v-bloq').checked;
+  document.getElementById('bloq-alert').style.display = bl ? 'block' : 'none';
+  checkCritBanner();
+};
+function checkCritBanner() {
+  const bl = document.getElementById('v-bloq').checked;
+  const m = parseInt(document.getElementById('s-m').value)||0;
+  const r = parseInt(document.getElementById('s-r').value)||0;
+  const msgs = [];
+  if (bl) msgs.push('Loja bloqueada no sistema');
+  if (m === 0) msgs.push('Mercearia sem estoque');
+  if (r === 0) msgs.push('Refrigerado sem estoque');
+  const el = document.getElementById('crit-banner');
+  el.innerHTML = msgs.length ? `<div class="crit-banner" onclick="toggleAlerts()"><i class="ti ti-alert-triangle" style="font-size:20px;flex-shrink:0"></i><div class="crit-banner-txt">${msgs.length} alerta${msgs.length>1?'s':''} crítico${msgs.length>1?'s':''}</div><i class="ti ti-chevron-right"></i></div>` : '';
+}
+
+// SALVAR NO FIREBASE
+window.salvarVisita = async function() {
+  const loja = document.getElementById('v-loja').value.trim();
+  if (!loja) { toast('Informe o nome da loja', '#E24B4A'); return; }
+  const v = {
+    promotora: usuario,
+    hora: document.getElementById('v-hora').value,
+    loja,
+    rede: document.getElementById('v-rede').value,
+    cod: document.getElementById('v-cod').value,
+    data: document.getElementById('v-data').value,
+    bloqueada: document.getElementById('v-bloq').checked,
+    mercearia: parseInt(document.getElementById('s-m').value)||0,
+    refrigerado: parseInt(document.getElementById('s-r').value)||0,
+    deposito: parseInt(document.getElementById('s-d').value)||0,
+    ruptura: document.getElementById('v-rupt').value,
+    validade: document.getElementById('v-val').value,
+    preco: document.getElementById('v-prec').value,
+    planograma: document.getElementById('v-plan').value,
+    obs: document.getElementById('v-obs').value,
+    criadoEm: serverTimestamp()
+  };
+  try {
+    await addDoc(collection(db, 'visitas'), v);
+    toast('✓ ' + loja + ' salva e sincronizada!', '#1D9E75');
+    document.getElementById('v-loja').value = '';
+    document.getElementById('v-rede').value = '';
+    document.getElementById('v-cod').value = '';
+    document.getElementById('v-obs').value = '';
+    document.getElementById('v-bloq').checked = false;
+    document.getElementById('bloq-alert').style.display = 'none';
+    ['s-m','s-r','s-d'].forEach(id => document.getElementById(id).value = 0);
+    updStock();
+  } catch(e) {
+    toast('Erro ao salvar. Verifique conexão.', '#E24B4A');
+  }
+};
+
+// ALERTAS
+function gerarAlertas() {
+  const al = [];
+  visitas.forEach(v => {
+    if (v.bloqueada) al.push({tipo:'danger', titulo:`${v.loja} — bloqueada`, desc:`${v.promotora} · ${fmtD(v.data)} ${v.hora}`});
+    if (v.mercearia === 0) al.push({tipo:'danger', titulo:`${v.loja} — mercearia zerada`, desc:`Refr: ${v.refrigerado} · Dep: ${v.deposito} · ${fmtD(v.data)}`});
+    if (v.refrigerado === 0) al.push({tipo:'danger', titulo:`${v.loja} — refrigerado zerado`, desc:`Merc: ${v.mercearia} · ${fmtD(v.data)}`});
+    if (v.ruptura === 'sim') al.push({tipo:'danger', titulo:`${v.loja} — ruptura total`, desc:`Produto sem gôndola · ${v.promotora}`});
+    if (v.validade === 'vencido') al.push({tipo:'danger', titulo:`${v.loja} — itens vencidos`, desc:`Verificar imediatamente · ${fmtD(v.data)}`});
+    if (v.mercearia > 0 && v.mercearia <= 5) al.push({tipo:'warn', titulo:`${v.loja} — mercearia baixa`, desc:`Apenas ${v.mercearia} un.`});
+    if (v.refrigerado > 0 && v.refrigerado <= 5) al.push({tipo:'warn', titulo:`${v.loja} — refrigerado baixo`, desc:`Apenas ${v.refrigerado} un.`});
+    if (v.validade === 'alerta') al.push({tipo:'warn', titulo:`${v.loja} — validade próxima`, desc:`Verificar prazos`});
+  });
+  return al;
+}
+function renderAlertas() {
+  const al = gerarAlertas();
+  const criticos = al.filter(a => a.tipo === 'danger').length;
+  const badge = document.getElementById('bell-badge');
+  badge.textContent = criticos;
+  badge.style.display = criticos > 0 ? 'flex' : 'none';
+  const lista = document.getElementById('alert-lista');
+  lista.innerHTML = al.length ? al.map(a => `<div class="alert-item"><div class="alert-ico ${a.tipo}"><i class="ti ${a.tipo==='danger'?'ti-alert-triangle':'ti-alert-circle'}"></i></div><div><div style="font-size:14px;font-weight:600;color:var(--text)">${a.titulo}</div><div style="font-size:12px;color:var(--text2);margin-top:3px">${a.desc}</div></div></div>`).join('') : '<div class="empty"><i class="ti ti-check" style="font-size:32px;color:#1D9E75"></i><br>Tudo ok!</div>';
+}
+window.toggleAlerts = function() { document.getElementById('alert-panel').classList.toggle('open'); };
+
+// MÉTRICAS
+function renderMetrics() {
+  const hoje = new Date().toISOString().slice(0,10);
+  const deHoje = visitas.filter(v => v.data === hoje).length;
+  const bloqueadas = visitas.filter(v => v.bloqueada).length;
+  const rupturas = visitas.filter(v => v.ruptura === 'sim').length;
+  document.getElementById('gestor-metrics').innerHTML = `<div class="gestor-metrics"><div class="metric-card ok"><div class="metric-num">${deHoje}</div><div class="metric-lbl">Visitas hoje</div></div><div class="metric-card"><div class="metric-num">${visitas.length}</div><div class="metric-lbl">Total registradas</div></div><div class="metric-card ${bloqueadas>0?'danger':'ok'}"><div class="metric-num">${bloqueadas}</div><div class="metric-lbl">Lojas bloqueadas</div></div><div class="metric-card ${rupturas>0?'danger':'ok'}"><div class="metric-num">${rupturas}</div><div class="metric-lbl">Rupturas ativas</div></div></div>`;
+}
+
+// HISTÓRICO
+function renderHist() {
+  const el = document.getElementById('lista-hist');
+  if (!visitas.length) { el.innerHTML = '<div class="empty">Nenhuma visita registrada ainda.</div>'; return; }
+  el.innerHTML = visitas.slice(0,50).map(v => `<div class="hist-item" onclick="abrirModal('${v.id}')"><div class="hist-top"><span class="hist-loja">${v.loja}${v.rede?' · '+v.rede:''}</span><span class="hist-meta">${fmtD(v.data)}<br>${v.hora||''}</span></div><div style="font-size:12px;color:var(--text3);margin-bottom:6px">${v.promotora}</div><div class="hist-badges"><span class="badge ${v.mercearia===0?'b-danger':v.mercearia<=5?'b-warn':'b-ok'}">Merc ${v.mercearia}</span><span class="badge ${v.refrigerado===0?'b-danger':v.refrigerado<=5?'b-warn':'b-ok'}">Refr ${v.refrigerado}</span><span class="badge ${v.deposito===0?'b-danger':v.deposito<=5?'b-warn':'b-ok'}">Dep ${v.deposito}</span>${v.bloqueada?'<span class="badge b-danger"><i class="ti ti-lock"></i> Bloqueada</span>':''}${v.ruptura==='sim'?'<span class="badge b-danger">Ruptura</span>':v.ruptura==='parcial'?'<span class="badge b-warn">Rupt. parcial</span>':''}${v.validade==='vencido'?'<span class="badge b-danger">Vencido</span>':v.validade==='alerta'?'<span class="badge b-warn">Val. próxima</span>':''}</div>${v.obs?`<div style="font-size:12px;color:var(--text3);margin-top:5px">${v.obs.slice(0,100)}${v.obs.length>100?'…':''}</div>`:''}</div>`).join('');
+}
+
+// MODAL
+window.abrirModal = function(id) {
+  const v = visitas.find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('modal-title').textContent = v.loja + (v.rede ? ' — ' + v.rede : '');
+  const rows = [['Promotora',v.promotora],['Data',fmtD(v.data)],['Chegada',v.hora||'—'],['Código',v.cod||'—'],['Bloqueada',v.bloqueada?'⛔ Sim':'✅ Não'],['Mercearia',v.mercearia+' un.'],['Refrigerado',v.refrigerado+' un.'],['Depósito',v.deposito+' un.'],['Ruptura',{nao:'Não',sim:'Sim',parcial:'Parcial'}[v.ruptura]||v.ruptura],['Validade',{ok:'Ok',alerta:'Próxima',vencido:'⚠️ Vencido'}[v.validade]||v.validade],['Observações',v.obs||'—']];
+  document.getElementById('modal-body').innerHTML = rows.map(([k,val]) => `<div class="modal-row"><span class="modal-key">${k}</span><span class="modal-val">${val}</span></div>`).join('');
+  document.getElementById('modal-overlay').classList.add('open');
+};
+window.fecharModal = function() { document.getElementById('modal-overlay').classList.remove('open'); };
+
+// DEGUSTAÇÃO
+window.decidirRapido = function() {
+  const bloq = document.getElementById('d-bloq').value;
+  const m = parseInt(document.getElementById('d-m').value)||0;
+  const r = parseInt(document.getElementById('d-r').value)||0;
+  const d = parseInt(document.getElementById('d-d').value)||0;
+  const rupt = document.getElementById('d-rupt').value;
+  const total = m+r+d;
+  const el = document.getElementById('dec-local');
+  el.style.display = 'block'; el.className = 'dec-box';
+  if (bloq==='sim') { el.classList.add('nogo'); el.innerHTML='<div class="dec-title"><i class="ti ti-x"></i> Não realizar</div><div class="dec-body">Loja bloqueada.</div>'; }
+  else if (total===0||(m===0&&r===0)) { el.classList.add('nogo'); el.innerHTML='<div class="dec-title"><i class="ti ti-alert-triangle"></i> Não realizar</div><div class="dec-body">Estoque zerado. Repor antes.</div>'; }
+  else if (rupt==='sim'||total<6) { el.classList.add('cond'); el.innerHTML=`<div class="dec-title"><i class="ti ti-alert-circle"></i> Condicional</div><div class="dec-body">Estoque baixo (${total} un.). Repor antes.</div>`; }
+  else { el.classList.add('go'); el.innerHTML=`<div class="dec-title"><i class="ti ti-circle-check"></i> Realizar ✓</div><div class="dec-body">Estoque ok (${total} un.).</div>`; }
+};
+
+window.analisarDeg = async function() {
+  const loja=document.getElementById('d-loja').value||'Não informada';
+  const rede=document.getElementById('d-rede').value||'não informada';
+  const m=document.getElementById('d-m').value; const r=document.getElementById('d-r').value; const d=document.getElementById('d-d').value;
+  const bloq=document.getElementById('d-bloq').value; const rupt=document.getElementById('d-rupt').value;
+  const fluxo=document.getElementById('d-fluxo').value; const disp=document.getElementById('d-disp').value;
+  const obs=document.getElementById('d-obs').value;
+  document.getElementById('load-deg').classList.add('on'); document.getElementById('ai-deg-card').style.display='none';
+  const prompt=`Especialista em trade marketing no varejo brasileiro. Decida sobre degustação:\n\nLOJA: ${loja} (${rede})\nESTOQUE: Merc ${m} | Refr ${r} | Dep ${d}\nBLOQUEADA: ${bloq} | RUPTURA: ${rupt} | FLUXO: ${fluxo} | DISPONÍVEL: ${disp}\nOBSERVAÇÃO: ${obs||'nenhuma'}\n\nResponda:\n1. DECISÃO: Realizar / Não realizar / Condicional\n2. JUSTIFICATIVA (2-3 pontos)\n3. SE CONDICIONAL: O que resolver antes\n4. DICA PRÁTICA\n\nSeja direto e use linguagem simples.`;
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})});
+    const json = await resp.json();
+    document.getElementById('ai-deg-txt').textContent = json.content?.find(c=>c.type==='text')?.text||'Erro.';
+    document.getElementById('ai-deg-card').style.display='block';
+  } catch(e) { document.getElementById('ai-deg-txt').textContent='Erro de conexão.'; document.getElementById('ai-deg-card').style.display='block'; }
+  document.getElementById('load-deg').classList.remove('on');
+};
+
+// AGENDA (local)
+const tipoC={rotina:'b-info',degustacao:'b-warn',reposicao:'b-danger',auditoria:'b-info'};
+const tipoL={rotina:'Rotina',degustacao:'Degustação',reposicao:'Reposição urgente',auditoria:'Auditoria'};
+window.agendarVisita = function() {
+  const a={id:Date.now(),loja:document.getElementById('ag-loja').value.trim()||'Loja',promotora:document.getElementById('ag-prom').value.trim(),data:document.getElementById('ag-data').value,tipo:document.getElementById('ag-tipo').value};
+  agenda.push(a); agenda.sort((a,b)=>a.data.localeCompare(b.data));
+  try{localStorage.setItem('pf_ag',JSON.stringify(agenda));}catch(e){}
+  renderAgenda(); document.getElementById('ag-loja').value=''; toast('✓ Agendado','#1D9E75');
+};
+function renderAgenda() {
+  const el=document.getElementById('lista-agenda');
+  if (!agenda.length){el.innerHTML='<div class="empty">Nenhuma visita agendada.</div>';return;}
+  el.innerHTML=agenda.map(a=>`<div class="ag-item"><div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:${a.tipo==='reposicao'?'var(--red)':a.tipo==='degustacao'?'var(--warn)':'var(--blue)'}"></div><div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--text)">${a.loja}</div><div style="font-size:12px;color:var(--text3)">${a.promotora?a.promotora+' · ':''}${fmtD(a.data)} <span class="badge ${tipoC[a.tipo]||'b-info'}">${tipoL[a.tipo]||a.tipo}</span></div></div><button onclick="remAg(${a.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:22px"><i class="ti ti-trash"></i></button></div>`).join('');
+}
+window.remAg = function(id) { agenda=agenda.filter(a=>a.id!==id); try{localStorage.setItem('pf_ag',JSON.stringify(agenda));}catch(e){} renderAgenda(); };
+
+// RESUMO
+window.resumoDia = async function() {
+  if (!visitas.length){toast('Sem visitas','#E24B4A');return;}
+  const hoje=new Date().toISOString().slice(0,10);
+  const lista=visitas.filter(v=>v.data===hoje).length?visitas.filter(v=>v.data===hoje):visitas.slice(0,8);
+  document.getElementById('load-res').classList.add('on'); document.getElementById('resumo-txt').style.display='none';
+  const prompt=`Resumo executivo de visitas de promotoria:\n\n${lista.map(v=>`${v.loja}|${v.promotora}|Merc:${v.mercearia}|Refr:${v.refrigerado}|Dep:${v.deposito}|Bloq:${v.bloqueada?'Sim':'Não'}|Rupt:${v.ruptura}|${v.obs||''}`).join('\n')}\n\nDestaque lojas críticas, status de estoque e ações urgentes para amanhã. Conciso e executivo.`;
+  try {
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:prompt}]})});
+    const json=await resp.json();
+    document.getElementById('resumo-txt').textContent=json.content?.find(c=>c.type==='text')?.text||'Erro.';
+    document.getElementById('resumo-txt').style.display='block';
+  } catch(e){document.getElementById('resumo-txt').textContent='Erro de conexão.';}
+  document.getElementById('load-res').classList.remove('on');
+};
+
+// CSV
+window.exportCSV = function() {
+  if (!visitas.length){toast('Sem dados','#E24B4A');return;}
+  const h=['Data','Hora','Loja','Rede','Codigo','Promotora','Bloqueada','Mercearia','Refrigerado','Deposito','Ruptura','Validade','Preco','Planograma','Observacoes'];
+  const rows=visitas.map(v=>[v.data,v.hora,v.loja,v.rede||'',v.cod||'',v.promotora,v.bloqueada?'Sim':'Não',v.mercearia,v.refrigerado,v.deposito,v.ruptura,v.validade,v.preco,v.planograma,(v.obs||'').replace(/[\n\r,]/g,' ')].join(','));
+  const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='visitas_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); toast('✓ CSV exportado','#1D9E75');
+};
+
+// UTILS
+function fmtD(d){if(!d)return'';const[y,m,day]=d.split('-');return`${day}/${m}`;}
+window.toast = function(msg,color){const t=document.getElementById('toast');t.textContent=msg;t.style.background=color||'#1D9E75';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);};
+</script>
+</body>
+</html>
